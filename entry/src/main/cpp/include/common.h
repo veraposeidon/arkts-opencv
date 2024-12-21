@@ -7,17 +7,12 @@
 #ifndef OpencvSample_common_H
 #define OpencvSample_common_H
 
-#include <string>
 #include <stdio.h>
 #include <js_native_api.h>
 #include <js_native_api_types.h>
-#include <vector>
 #include "opencv2/opencv.hpp"
 #include "hilog/log.h"
 #include "napi/native_api.h"
-#include "rawfile/raw_file_manager.h"
-#include "rawfile/raw_file.h"
-#include "rawfile/raw_dir.h"
 
 #define GLOBAL_RESMGR (0xFFEE)
 constexpr int32_t RGB_565 = 2;
@@ -84,4 +79,5 @@ extern napi_value NapiGetNull(napi_env env);
 extern uint32_t GetMatDataBuffSize(const cv::Mat &mat);
 extern bool WrapJsPixelInfoInfo(napi_env env, cv::Mat &outMat, napi_value &result);
 extern bool CreateArrayBuffer(napi_env env, uint8_t *src, size_t srcLen, napi_value *res);
-#endif //OpencvSample_common_H
+
+#endif // OpencvSample_common_H

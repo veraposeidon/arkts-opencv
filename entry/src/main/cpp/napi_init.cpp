@@ -1,8 +1,6 @@
 #include "napi/native_api.h"
 #include <string>
-#include <iostream>
 #include "common.h"
-#include <fstream>
 
 static napi_value Add(napi_env env, napi_callback_info info) {
     size_t argc = 2;

@@ -1,5 +1,3 @@
-import resourceManager from '@ohos.resourceManager';
-
 export interface ImageBuffer {
   width: number;
   height: number;
