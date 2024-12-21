@@ -34,3 +34,4 @@
 2. [OpenHarmony OpenCV 应用开发实践](https://forums.openharmony.cn/forum.php?mod=viewthread&tid=2218)
    - 文章的示例代码位于评论区
    - common.h 和 common.cpp 参考自该示例代码
+3. [番外篇：仿射变换与透视变换 | Arthur Wang](https://codec.wang/docs/opencv/start/extra-05-warpaffine-warpperspective#%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2)
