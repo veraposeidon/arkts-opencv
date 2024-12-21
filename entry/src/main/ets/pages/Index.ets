@@ -49,26 +49,42 @@ struct Index {
     await pixelMap.readPixelsToBuffer(arrayBuffer);
     const width = pixelMap.getImageInfoSync().size.width;
     const height = pixelMap.getImageInfoSync().size.height;
-    const result  = testNapi.processImage({
+    const format = pixelMap.getImageInfoSync().pixelFormat;
+    console.log('format', format)
+
+    // 灰度变换
+    // const result  = testNapi.processImage({
+    //   width: width,
+    //   height: height,
+    //   data: arrayBuffer
+    // });
+
+    // 透视变换
+    const result = testNapi.transformImage({
       width: width,
       height: height,
-      data: arrayBuffer
+      data: arrayBuffer,
+      srcPoints: srcPoints,
+      dstPoints: dstPoints,
+      dstWidth: 320,
+      dstHeight: 178
     });
+
     // 使用处理后的数据
     console.info(`Processed image: ${result.cols}x${result.rows}`)
+
     let opts: image.InitializationOptions = {
       editable: true,
       pixelFormat: image.PixelMapFormat.RGBA_8888,
       size: { height: result.rows, width: result.cols }
     }
 
-    image.createPixelMap(result.byteBuffer, opts, async (error, pixelMap2) => {
+    image.createPixelMap(result.byteBuffer, opts, async (error, pixelMap) => {
       if (error) {
         console.error(`Failed to create pixelMap error_code ${error.code}`);
       } else {
         console.info('Succeeded in creating pixelMap.');
-        this.destPixelMap = pixelMap2;
-        console.info('result buffer length', await pixelMap2.getPixelBytesNumber())
+        this.destPixelMap = pixelMap;
       }
     })
 

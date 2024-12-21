@@ -13,6 +13,22 @@ export interface PixelInfo {
   byteBuffer: ArrayBuffer;
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface TransformParams {
+  width: number;
+  height: number;
+  data: ArrayBuffer;
+  srcPoints: Point[];
+  dstPoints: Point[];
+  dstWidth: number;
+  dstHeight: number;
+}
+
 export const add: (a: number, b: number) => number;
 export const getHelloString: () => string;
 export const processImage: (imageBuffer: ImageBuffer) => PixelInfo;
+export const transformImage: (params: TransformParams) => PixelInfo;
