@@ -7,12 +7,10 @@ import { image } from '@kit.ImageKit';
 @Entry
 @ComponentV2
 struct Index {
-  @Local pixelMap?: PixelMap
+  @Local sourcePixelMap?: PixelMap
+  @Local destPixelMap?: PixelMap;
 
   async transformImage() {
-    // 源图片尺寸
-    const sourceWidth: number = 570;
-    const sourceHeight: number = 405;
     // 源图片中选择的四个角点
     const srcPoints: Array<common2D.Point> = [
       { x: 148, y: 80 },
@@ -20,6 +18,7 @@ struct Index {
       { x: 94, y: 247 },
       { x: 423, y: 288 },
     ];
+
     // pts2 = np.float32([[0, 0], [320, 0], [0, 178], [320, 178]])
     const dstPoints: Array<common2D.Point> = [
       { x: 0, y: 0 },
@@ -35,15 +34,44 @@ struct Index {
       return;
     }
 
-    const imageData = getContext().resourceManager.getMediaContentSync($r('app.media.card'));
-    const imageBuffer = imageData.buffer;
-    const imageSource = image.createImageSource(imageBuffer);
+    const sourceImageData = getContext().resourceManager.getRawFileContentSync('card.png');
+    const sourceImageBuffer = sourceImageData.buffer;
+    const imageSource = image.createImageSource(sourceImageBuffer);
 
     const pixelMap = await imageSource.createPixelMap()
 
-    this.pixelMap = pixelMap;
+    this.sourcePixelMap = pixelMap;
 
-    const canvasRenderingContext: CanvasRenderingContext2D = new CanvasRenderingContext2D();
+    const sourceImageBufferLength = await pixelMap.getPixelBytesNumber();
+
+    const arrayBuffer = new ArrayBuffer(sourceImageBufferLength);
+
+    await pixelMap.readPixelsToBuffer(arrayBuffer);
+    const width = pixelMap.getImageInfoSync().size.width;
+    const height = pixelMap.getImageInfoSync().size.height;
+    const result  = testNapi.processImage({
+      width: width,
+      height: height,
+      data: arrayBuffer
+    });
+    // 使用处理后的数据
+    console.info(`Processed image: ${result.cols}x${result.rows}`)
+    let opts: image.InitializationOptions = {
+      editable: true,
+      pixelFormat: image.PixelMapFormat.RGBA_8888,
+      size: { height: result.rows, width: result.cols }
+    }
+
+    image.createPixelMap(result.byteBuffer, opts, async (error, pixelMap2) => {
+      if (error) {
+        console.error(`Failed to create pixelMap error_code ${error.code}`);
+      } else {
+        console.info('Succeeded in creating pixelMap.');
+        this.destPixelMap = pixelMap2;
+        console.info('result buffer length', await pixelMap2.getPixelBytesNumber())
+      }
+    })
+
   }
 
   build() {
@@ -54,21 +82,23 @@ struct Index {
           hilog.info(0x0000, 'testTag', 'Test NAPI 2 + 3 = %{public}d', testNapi.add(2, 3));
           console.log(testNapi.getHelloString())
         })
-      Text("Source")
-        .id('Source')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-      Image($r('app.media.card'))
-        .width('100%')
+      // Text("Source")
+      //   .id('Source')
+      //   .fontSize(20)
+      // Image($rawfile('card.png'))
+      //   .width('100%')
       Text("PixelMap")
         .id('PixelMap')
         .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-      Image(this.pixelMap)
+      Image(this.sourcePixelMap)
+        .width('100%')
+      Text("DestPixelMap")
+        .id('DestPixelMap')
+        .fontSize(20)
+      Image(this.destPixelMap)
         .width('100%')
     }
     .height('100%')
     .width('100%')
   }
-
 }
